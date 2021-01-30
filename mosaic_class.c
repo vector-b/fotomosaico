@@ -15,22 +15,34 @@ FILE* P6_type(FILE *f, imagem *img)
 	img -> pixels = malloc(img -> height * sizeof(unsigned char));
 	for (int k = 0; k < img -> height ; k++)
 		img -> pixels[k] = malloc(img -> width * sizeof(unsigned char));
-		
+	
+
+	unsigned char r;
+	unsigned char g;
+	unsigned char b;
+
+	int r_a;
+	int g_a;
+	int b_a;
+
+	r_a = 0;
+	g_a = 0;
+	b_a = 0;
 	for (int i = 0; i < img -> max; i++)
 	{
-		unsigned char r;
-		unsigned char g;
-		unsigned char b;
-		
+				
 		fread(&r, 1, 1, f);
-
 		fread(&g, 1, 1, f);
-
 		fread(&b, 1, 1, f);
 
-		printf("%d\n",r );
-		printf("%d\n",g );
-		printf("%d\n",b );
+		r_a += (int)r;
+		g_a += (int)g;
+		b_a += (int)b;
+
+		printf("%d\n",r_a );
+		printf("%d\n",g_a);
+		printf("%d\n",b_a);
+		printf("\n");
 	}
 	return f;
 }
