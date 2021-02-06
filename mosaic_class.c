@@ -1,8 +1,26 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <dirent.h>
 #include "mosaic_class.h"
 
+int calcula_tam()
+{
+	int contador = 0;
+	DIR *d;
+    struct dirent *dir;
+    d = opendir("./tiles20");
+    if (d)
+    {
+        while ((dir = readdir(d)) != NULL)
+        {
+            contador++;
+        }
+        closedir(d);
+    }
+    contador -= 2;
+    return contador;
+}
 
 FILE* P3_type(FILE *f, imagem *img)
 {
@@ -16,14 +34,9 @@ FILE* P6_type(FILE *f, imagem *img)
 	for (int i = 0; i < img -> height; i++)
 		img -> pixels[i] = malloc(img -> width * 3 * sizeof(unsigned char*));	
 
-	/*for (int i = 0; i < img -> height; i++)
-		for (int k = 0; k < img -> width; k++)
-			img -> pixels[i][k] = 'a';	
-*/
 	unsigned char r;
 	unsigned char g;
 	unsigned char b;
-	int cont = 0;
 	int r_a;
 	int g_a;
 	int b_a;
@@ -36,7 +49,6 @@ FILE* P6_type(FILE *f, imagem *img)
 	{
 		for (int k = 0; k < img -> width; k+=3)
 		{		
-			printf("Pixel -> %d - %d\n", i,k);
 			fread(&r, 1, 1, f);
 			img -> pixels[i][k] = r;
 			fread(&g, 1, 1, f);
@@ -47,67 +59,79 @@ FILE* P6_type(FILE *f, imagem *img)
 			r_a += (int)r;
 			g_a += (int)g;
 			b_a += (int)b;
-
-			printf("%d\n",r_a );
-			printf("%d\n",g_a);
-			printf("%d\n",b_a);
-			printf("\n");
-			cont++;
 		}
 	}
 	img -> p_color  = malloc(sizeof(rgb));
 	img -> p_color -> r = r_a;
 	img -> p_color -> g = g_a;
 	img -> p_color -> b = b_a;
-	
-	printf("%d\n",img->height * img -> width );
 	return f;
 }
 
-void ler_pastilha()
+imagem **ler_pastilha(imagem **img)
 {
 
-	/*struct imagem{
-	char type;
-	int width;
-	int height;
-	int scale;
-	int max;
-	char** pixels;
-	int p_color;
-};*/
+	int count = 0;
+	int index = 0;
+	DIR *d;
+    struct dirent *dir;
+    d = opendir("./tiles20");
+    if (d)
+    {
+        while ((dir = readdir(d)) != NULL)
+        {
+        	if (count >= 2)
+        	{
+        		//printf("%s\n", dir->d_name);
+        		imagem *im;
+        		im = malloc(sizeof(imagem));
+        		
+        		char path[100] = "tiles20/";
+        		strcat(path, dir-> d_name);
+        		//printf("%s\n",path );
+        		//Inicia o file
+        		FILE *fp;
+        		fp = fopen(path,"r");
 
-	imagem *im;
-	im = malloc(sizeof(imagem));
-	//Inicia o file
-	FILE *fp;
-	fp = fopen("tiles20/00020FA269E3AAE8538F4B0153DD06D5E799209F.ppm","r");
+        		//Captura os tipos, tamanhos e color scale
+        		char type[2];
+        		fscanf(fp, "%s", type); 
+        		
+        		int height;
+        		int width;
+        		int color_scale; 
 
-	//Captura os tipos, tamanhos e color scale
-	char type[2];
-	fscanf(fp, "%s", type); 
-	
-	int height;
-	int width;
-	int color_scale; 
+        		fscanf(fp, "%d", &width);
+        		fscanf(fp, "%d", &height); 
+        		fscanf(fp, "%d", &color_scale); 
 
-	fscanf(fp, "%d", &width);
-	fscanf(fp, "%d", &height); 
-	fscanf(fp, "%d", &color_scale); 
+        		int MAX_PIXELS;
+        		MAX_PIXELS = height * width;
 
-	int MAX_PIXELS;
-	MAX_PIXELS = height * width;
+        		strcpy(im -> type , type);
+        		im -> width = width;
+        		im -> height = height;
+        		im -> scale = color_scale;
+        		im -> max = MAX_PIXELS;
+        		//printf(" Tipo: %s \n Altura: %d \n Largura: %d \n Escala: %d \n Pixels: %d \n ",im -> type,im -> height, im -> width,im -> scale,im -> max);
 
-	strcpy(im -> type , type);
-	im -> width = width;
-	im -> height = height;
-	im -> scale = color_scale;
-	im -> max = MAX_PIXELS;
-	printf(" Tipo: %s \n Altura: %d \n Largura: %d \n Escala: %d \n Pixels: %d \n ",im -> type,im -> height, im -> width,im -> scale,im -> max);
+        		if (strcmp(type,"P3") == 0)
+        			fp = P6_type(fp, im);
+        		else
+        			fp = P6_type(fp, im);
 
-	if (strcmp(type,"P3") == 0)
-		fp = P3_type(fp, im);
-	else
-		fp = P6_type(fp, im);
+        		fclose(fp);
+        		//img[index] = malloc(100*sizeof(im));
+        		//img[index] = im;
+        		index++;
+        		printf("%d\n",index );
+        	}
+            
+            count++;
 
+        }
+        closedir(d);
+    }
+
+	return img;
 }

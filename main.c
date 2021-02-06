@@ -3,13 +3,18 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include "mosaic_class.h"
 
 int main(int argc, char const *argv[])
 {
-	for (int i = 0; i <= 0; i++)
-	{
-		ler_pastilha();
-	}
+	int n_pastilhas = 0 ;
+	n_pastilhas = calcula_tam();
+	
+	imagem **pastilhas;	
+	pastilhas = malloc(sizeof(pastilhas));
+	printf("pastilhas -> %d\n",n_pastilhas );
+	pastilhas = ler_pastilha(pastilhas);
+
 	return 0;
 }

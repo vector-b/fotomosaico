@@ -22,9 +22,10 @@ struct imagem{
 
 typedef struct imagem imagem;
 
-void ler_pastilha();
+imagem **ler_pastilha(imagem **img);
 FILE* P3_type(FILE *f, imagem *img);
 FILE* P6_type(FILE *f, imagem *img);
+int calcula_tam();
 
 
 #endif
