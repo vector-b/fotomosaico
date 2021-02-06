@@ -55,23 +55,11 @@ FILE* P6_type(FILE *f, imagem *img)
 			cont++;
 		}
 	}
-	/*for (int i = 0; i < img -> max; i++)
-	{
-				
-		fread(&r, 1, 1, f);
-		fread(&g, 1, 1, f);
-		fread(&b, 1, 1, f);
-
-		r_a += (int)r;
-		g_a += (int)g;
-		b_a += (int)b;
-
-		printf("%d\n",r_a );
-		printf("%d\n",g_a);
-		printf("%d\n",b_a);
-		printf("\n");
-		cont++;
-	}*/
+	img -> p_color  = malloc(sizeof(rgb));
+	img -> p_color -> r = r_a;
+	img -> p_color -> g = g_a;
+	img -> p_color -> b = b_a;
+	
 	printf("%d\n",img->height * img -> width );
 	return f;
 }

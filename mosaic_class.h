@@ -2,6 +2,13 @@
 #define __MOSAIC__
 
 
+struct rgb
+{
+	int r;
+	int g;
+	int b;	
+};
+typedef struct rgb rgb;
 
 struct imagem{
 	char type[2];
@@ -10,7 +17,7 @@ struct imagem{
 	int scale;
 	int max;
 	unsigned char** pixels;
-	int p_color;
+	rgb* p_color;
 };
 
 typedef struct imagem imagem;
