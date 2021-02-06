@@ -9,7 +9,7 @@ struct imagem{
 	int height;
 	int scale;
 	int max;
-	char** pixels;
+	unsigned char** pixels;
 	int p_color;
 };
 
