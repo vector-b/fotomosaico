@@ -6,15 +6,24 @@
 #include <stdlib.h>
 #include "mosaic_class.h"
 
-int main(int argc, char const *argv[])
+int main(int argc, char *argv[])
 {
 	int n_pastilhas = 0 ;
-	n_pastilhas = calcula_tam();
+	char *path = argv[0];
+	n_pastilhas = calcula_tam(path);
 	
 	imagem **pastilhas;	
-	pastilhas = malloc(sizeof(pastilhas));
-	printf("pastilhas -> %d\n",n_pastilhas );
+	pastilhas = malloc(n_pastilhas*sizeof(**pastilhas));
 	pastilhas = ler_pastilha(pastilhas);
+
+	printf("%d pastilhas carregadas.\n",n_pastilhas );
+
+	char file[100] = "macaco.ppm";
+	imagem *img_crt;
+	img_crt = malloc(sizeof(*img_crt));
+	
+	img_crt = ler_img(img_crt, file);
+	printf("Imagem >%s< lida com sucesso.\n",file);
 
 	return 0;
 }

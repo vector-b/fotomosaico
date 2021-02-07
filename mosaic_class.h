@@ -25,7 +25,8 @@ typedef struct imagem imagem;
 imagem **ler_pastilha(imagem **img);
 FILE* P3_type(FILE *f, imagem *img);
 FILE* P6_type(FILE *f, imagem *img);
-int calcula_tam();
+int calcula_tam(char *argv);
+imagem *ler_img(imagem *img, char file[100]);
 
 
 #endif
