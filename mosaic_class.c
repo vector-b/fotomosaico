@@ -167,3 +167,18 @@ imagem *ler_img(imagem *img, char file[100])
 
 	return img;
 }
+imagem *input_calc(imagem *img, imagem **pastilhas)
+{
+	int d_height = pastilhas[0] -> height;
+	int d_width = pastilhas[0] -> width;
+	printf("Largura %d / Altura %d\n",d_width,d_height );
+
+	for (int i = 0; i < img -> width - d_width; i++)
+		for (int k = 0; k <  3 * (img -> height - d_height); k++)
+			for (int j = 0; j < ; j++)
+				for (int l = 0; l < ; l++)
+				{
+					/* code */
+				}
+	return img;
+}

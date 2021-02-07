@@ -27,6 +27,7 @@ FILE* P3_type(FILE *f, imagem *img);
 FILE* P6_type(FILE *f, imagem *img);
 int calcula_tam(char *argv);
 imagem *ler_img(imagem *img, char file[100]);
+imagem *input_calc(imagem *img, imagem **pastilhas);
 
 
 #endif

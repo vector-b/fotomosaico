@@ -25,5 +25,9 @@ int main(int argc, char *argv[])
 	img_crt = ler_img(img_crt, file);
 	printf("Imagem >%s< lida com sucesso.\n",file);
 
+	
+	imagem *result;
+	result = input_calc(img_crt,pastilhas);
+
 	return 0;
 }
