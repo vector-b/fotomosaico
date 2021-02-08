@@ -171,14 +171,45 @@ imagem *input_calc(imagem *img, imagem **pastilhas)
 {
 	int d_height = pastilhas[0] -> height;
 	int d_width = pastilhas[0] -> width;
+	int r_m;
+	int g_m;
+	int b_m;
 	printf("Largura %d / Altura %d\n",d_width,d_height );
 
-	for (int i = 0; i < img -> width - d_width; i++)
-		for (int k = 0; k <  3 * (img -> height - d_height); k++)
-			for (int j = 0; j < ; j++)
-				for (int l = 0; l < ; l++)
+	for (int i = 0; i < img -> height - 30; i+=30)
+	{
+		for (int k = 0; k < img -> width - 30; k+=30)
+		{
+			r_m = 0;
+			g_m = 0;
+			b_m = 0;
+			//Seção quadrados internos
+			int cont;
+			cont = 0;
+			for (int j = i; j < i+d_height-1; j++)
+			{
+				for (int l = k; l < k+d_width-2; l+=3)
 				{
-					/* code */
+					r_m += img -> pixels[j][l];
+					g_m += img -> pixels[j][l+1];
+					b_m += img -> pixels[j][l+2];
+					
+					cont++;
 				}
+			}
+			r_m = r_m /cont;
+			g_m = g_m /cont;
+			b_m = b_m /cont;
+		}
+	}
+
+	/*
+	for (int i = 0; i < img -> width - d_width; i+= d_width)
+		for (int k = 0; k <  3 * (img -> height - d_height); k+=d_height)
+			for (int j = i; j < (i + d_width) - 1 ; j++)
+				for (int l = k; l < (k + d_height) - 1; l++)
+				{
+					printf("%d \n",img -> pixels[j][l]);
+				}*/
 	return img;
 }
