@@ -24,10 +24,11 @@ typedef struct imagem imagem;
 
 imagem **ler_pastilha(imagem **img);
 FILE* P3_type(FILE *f, imagem *img);
-FILE* P6_type(FILE *f, imagem *img);
+imagem* P6_type(FILE *f, imagem *img);
 int calcula_tam(char *argv);
 imagem *ler_img(imagem *img, char file[100]);
-imagem *input_calc(imagem *img, imagem **pastilhas);
-
+imagem *input_calc(imagem *img, imagem **pastilhas,int n_pastilhas);
+imagem *busca_pastilha(imagem **pastilhas,int n_pastilhas, rgb *medias);
+void escreve_img(imagem *img);
 
 #endif

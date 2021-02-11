@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <dirent.h>
+#include <math.h>
 #include "mosaic_class.h"
 
 int calcula_tam(char *argv)
@@ -27,12 +28,15 @@ FILE* P3_type(FILE *f, imagem *img)
 	return f;
 }
 
-FILE* P6_type(FILE *f, imagem *img)
+imagem* P6_type(FILE *f, imagem *img)
 {
 
-	img -> pixels = malloc(img -> height * sizeof(unsigned char*));
+	//img -> pixels = malloc(img -> width * img -> height * sizeof(img -> pixels));
+	//fread(img->pixels, 3 * img->width, img->height, f);
+	img -> pixels = malloc(img -> height * sizeof(img -> pixels));
 	for (int i = 0; i < img -> height; i++)
-		img -> pixels[i] = malloc(img -> width * 3 * sizeof(unsigned char*));	
+		img -> pixels[i] = malloc(img -> width * 3 * sizeof(img -> pixels));	
+
 
 	unsigned char r;
 	unsigned char g;
@@ -46,26 +50,28 @@ FILE* P6_type(FILE *f, imagem *img)
 	b_a = 0;
 	
 	for (int i = 0; i < img -> height; i++)
-	{
-		for (int k = 0; k < img -> width; k+=3)
-		{		
-			fread(&r, 1, 1, f);
-			img -> pixels[i][k] = r;
-			fread(&g, 1, 1, f);
-			img -> pixels[i][k+1] = g;
-			fread(&b, 1, 1, f);
-			img -> pixels[i][k+2] = b;
+		fread(img -> pixels[i], 1, 3 * img -> width, f);
+
+	for (int k = 0; k < img -> height; k++)
+		for (int l = 0; l < img -> width-2; l+=3)
+		{
+			r = img -> pixels[k][l];
+			g = img -> pixels[k][l+1];
+			b = img -> pixels[k][l+2];	
 
 			r_a += (int)r;
 			g_a += (int)g;
 			b_a += (int)b;
 		}
-	}
+
 	img -> p_color  = malloc(sizeof(rgb));
 	img -> p_color -> r = r_a/img -> max;
 	img -> p_color -> g = g_a/img -> max;
 	img -> p_color -> b = b_a/img -> max;
-	return f;
+	fclose(f);
+
+	return img;
+
 }
 
 imagem **ler_pastilha(imagem **img)
@@ -84,7 +90,7 @@ imagem **ler_pastilha(imagem **img)
         	{
         		//printf("%s\n", dir->d_name);
         		imagem *im;
-        		im = malloc(sizeof(imagem));
+        		im = malloc(sizeof(imagem*));
         		
         		char path[100] = "tiles/";
         		strcat(path, dir-> d_name);
@@ -116,15 +122,16 @@ imagem **ler_pastilha(imagem **img)
         		//printf(" Tipo: %s \n Altura: %d \n Largura: %d \n Escala: %d \n Pixels: %d \n ",im -> type,im -> height, im -> width,im -> scale,im -> max);
 
         		if (strcmp(type,"P3") == 0)
-        			fp = P6_type(fp, im);
+        			im = P6_type(fp, im);
         		else
-        			fp = P6_type(fp, im);
+        			im = P6_type(fp, im);
 
         		fclose(fp);
         		//img[index] = malloc(100*sizeof(im));
         		img[index] = im;
         		//printf("%d\n",index );
         		index++;
+        		printf("%d\n", count );
         	}
             
             count++;
@@ -162,12 +169,48 @@ imagem *ler_img(imagem *img, char file[100])
 	img -> scale = color_scale;
 	img -> max = MAX_PIXELS;
 
-	fp = P6_type(fp, img);
-	fclose(fp);
+	img = P6_type(fp, img);
 
 	return img;
 }
-imagem *input_calc(imagem *img, imagem **pastilhas)
+
+imagem *busca_pastilha(imagem **pastilhas, int n_pastilhas, rgb *medias)
+{
+	int n_pas_reco = 0;
+	long int r_dif = 0;
+	long int g_dif = 0;
+	long int b_dif = 0;
+	long int total = 0;
+	long int menor = 0;
+	for (int i = 0; i < n_pastilhas; i++)
+	{
+		r_dif =  (medias -> r) - pastilhas[i] -> p_color -> r;
+		g_dif =  (medias -> g) - pastilhas[i] -> p_color -> g;
+		b_dif =  (medias -> b) - pastilhas[i] -> p_color -> b;
+
+		r_dif = r_dif * r_dif;
+		g_dif = g_dif * g_dif;
+		b_dif = b_dif * b_dif;
+
+
+		total  = r_dif + g_dif + b_dif;
+		total = sqrt(total);
+		if (i == 0)
+		{
+			menor = total;
+			n_pas_reco = i;
+
+		}
+		else if (total < menor)
+		{
+			menor = total;
+			n_pas_reco = i;
+		}
+	}
+	return pastilhas[n_pas_reco];
+
+}
+imagem *input_calc(imagem *img, imagem **pastilhas,int n_pastilhas)
 {
 	int d_height = pastilhas[0] -> height;
 	int d_width = pastilhas[0] -> width;
@@ -200,6 +243,22 @@ imagem *input_calc(imagem *img, imagem **pastilhas)
 			r_m = r_m /cont;
 			g_m = g_m /cont;
 			b_m = b_m /cont;
+
+			rgb *medias;
+			medias = malloc(sizeof(*medias));
+			medias -> r = r_m;
+			medias -> g = g_m;
+			medias -> b = b_m;
+			imagem *pastilha_slt;
+			pastilha_slt = busca_pastilha(pastilhas,n_pastilhas,medias);
+			//substitui pastilha no local
+			for (int a = 0; a < d_height; a++)
+				for (int b = 0; b < d_width-3; b+=3)
+				{
+					img -> pixels[i+a][k+b] = pastilha_slt -> pixels[a][b];
+					img -> pixels[i+a][k+b+1] = pastilha_slt -> pixels[a][b+1];
+					img -> pixels[i+a][k+b+1] = pastilha_slt -> pixels[a][b+2];
+				}
 		}
 	}
 
@@ -212,4 +271,23 @@ imagem *input_calc(imagem *img, imagem **pastilhas)
 					printf("%d \n",img -> pixels[j][l]);
 				}*/
 	return img;
+}
+
+void escreve_img(imagem *img)
+{
+	FILE * new;
+	new = fopen("result.ppm", "wb");
+	fprintf(new, "%s\n", img -> type);
+	fprintf(new, "%d %d\n", img -> width, img -> height );
+	fprintf(new, "%d\n",img -> scale);
+	
+	for (int i = 0; i < img -> height ; i++)
+		fwrite(img -> pixels[i], 1, 3*img -> width, new);
+	//fwrite(img->pixels, sizeof(img->pixels), 3*img->height*img->width, new);
+	//or (int j = 0; j < img -> height; j++) 
+	//	fwrite(img->pixels[3*img->width], 1, 3*img->width, new);
+
+	fclose(new);
+
+
 }

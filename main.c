@@ -8,6 +8,7 @@
 
 int main(int argc, char *argv[])
 {
+
 	int n_pastilhas = 0 ;
 	char *path = argv[0];
 	n_pastilhas = calcula_tam(path);
@@ -15,19 +16,22 @@ int main(int argc, char *argv[])
 	imagem **pastilhas;	
 	pastilhas = malloc(n_pastilhas*sizeof(**pastilhas));
 	pastilhas = ler_pastilha(pastilhas);
-
+/*
 	printf("%d pastilhas carregadas.\n",n_pastilhas );
 
-	char file[100] = "macaco.ppm";
+	char file[100] = "example.ppm";
 	imagem *img_crt;
 	img_crt = malloc(sizeof(*img_crt));
 	
 	img_crt = ler_img(img_crt, file);
-	printf("Imagem >%s< lida com sucesso.\n",file);
+	escreve_img(img_crt);
+
+	/*printf("Imagem >%s< lida com sucesso.\n",file);
 
 	
 	imagem *result;
-	result = input_calc(img_crt,pastilhas);
+	result = input_calc(img_crt,pastilhas,n_pastilhas);
 
+	*/
 	return 0;
 }

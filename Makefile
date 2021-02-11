@@ -1,7 +1,7 @@
 # Makefile
 OBJS =  main.c
 TARG = mosaico 
-CFLAG = -Wall 
+CFLAG = -Wall -lm
 CC = gcc
 INCLUDE = mosaic_class.c
 LIBS = -lncurses
