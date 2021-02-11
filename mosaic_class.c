@@ -10,7 +10,7 @@ int calcula_tam(char *argv)
 	int contador = 0;
 	DIR *d;
     struct dirent *dir;
-    d = opendir("./tiles");
+    d = opendir("./tiles20");
     if (d)
     {
         while ((dir = readdir(d)) != NULL)
@@ -81,7 +81,7 @@ imagem **ler_pastilha(imagem **img)
 	int index = 0;
 	DIR *d;
     struct dirent *dir;
-    d = opendir("./tiles");
+    d = opendir("./tiles20");
     if (d)
     {
         while ((dir = readdir(d)) != NULL)
@@ -92,7 +92,7 @@ imagem **ler_pastilha(imagem **img)
         		imagem *im;
         		im = malloc(100*sizeof(imagem*));
         		
-        		char path[100] = "tiles/";
+        		char path[100] = "tiles20/";
         		strcat(path, dir-> d_name);
         		//printf("%s\n",path );
         		//Inicia o file
@@ -230,7 +230,7 @@ imagem *input_calc(imagem *img, imagem **pastilhas,int n_pastilhas)
 			cont = 0;
 			for (int j = i; j < i+d_height-1; j++)
 			{
-				for (int l = k; l < k + (3*(d_width)); l+=3)
+				for (int l = k; l < k + (3*(d_width))-3; l+=3)
 				{
 					r_m += img -> pixels[j][l];
 					g_m += img -> pixels[j][l+1];
@@ -252,7 +252,7 @@ imagem *input_calc(imagem *img, imagem **pastilhas,int n_pastilhas)
 			pastilha_slt = busca_pastilha(pastilhas,n_pastilhas,medias);
 			//substitui pastilha no local
 			for (int a = 0; a < d_height; a++)
-				for (int b = 0; b < d_width-3; b+=3)
+				for (int b = 0; b < d_width; b+=3)
 				{
 					img -> pixels[i+a][k+b] = pastilha_slt -> pixels[a][b];
 					img -> pixels[i+a][k+b+1] = pastilha_slt -> pixels[a][b+1];
@@ -278,7 +278,7 @@ void escreve_img(imagem *img)
 	new = fopen("result.ppm", "wb");
 	fprintf(new, "%s\n", img -> type);
 	fprintf(new, "%d %d\n", img -> width, img -> height );
-	fprintf(new, "%d\n",img -> scale);
+	fprintf(new, "%d",img -> scale);
 	
 	for (int i = 0; i < img -> height ; i++)
 		fwrite(img -> pixels[i], 1, 3*img -> width, new);

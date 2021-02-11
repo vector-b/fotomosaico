@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
 
 	printf("%d pastilhas carregadas.\n",n_pastilhas );
 
-	char file[100] = "poppy.ppm";
+	char file[100] = "macaco.ppm";
 	imagem *img_crt;
 	img_crt = malloc(sizeof(*img_crt));
 	
