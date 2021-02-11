@@ -90,15 +90,18 @@ imagem **ler_pastilha(imagem **img)
         	{
         		//printf("%s\n", dir->d_name);
         		imagem *im;
-        		im = malloc(sizeof(imagem*));
+        		im = malloc(100*sizeof(imagem*));
         		
         		char path[100] = "tiles/";
         		strcat(path, dir-> d_name);
         		//printf("%s\n",path );
         		//Inicia o file
         		FILE *fp;
-        		fp = fopen(path,"r");
-
+        		if (!(fp = fopen(path,"r")))
+        		{
+        			printf("erro\n");
+        			exit(1);
+        		}
         		//Captura os tipos, tamanhos e color scale
         		char type[2];
         		fscanf(fp, "%s", type); 
@@ -110,10 +113,8 @@ imagem **ler_pastilha(imagem **img)
         		fscanf(fp, "%d", &width);
         		fscanf(fp, "%d", &height); 
         		fscanf(fp, "%d", &color_scale); 
-
         		int MAX_PIXELS;
         		MAX_PIXELS = height * width;
-
         		strcpy(im -> type , type);
         		im -> width = width;
         		im -> height = height;
@@ -121,17 +122,14 @@ imagem **ler_pastilha(imagem **img)
         		im -> max = MAX_PIXELS;
         		//printf(" Tipo: %s \n Altura: %d \n Largura: %d \n Escala: %d \n Pixels: %d \n ",im -> type,im -> height, im -> width,im -> scale,im -> max);
 
-        		if (strcmp(type,"P3") == 0)
-        			im = P6_type(fp, im);
-        		else
-        			im = P6_type(fp, im);
+        		im = P6_type(fp, im);
 
-        		fclose(fp);
+		//   ARRUMAR ISSO PORA     		fclose(fp);
+        		
         		//img[index] = malloc(100*sizeof(im));
         		img[index] = im;
         		//printf("%d\n",index );
         		index++;
-        		printf("%d\n", count );
         	}
             
             count++;
@@ -150,6 +148,7 @@ imagem *ler_img(imagem *img, char file[100])
 
 	//Captura os tipos, tamanhos e color scale
 	char type[2];
+
 	fscanf(fp, "%s", type); 
 	
 	int height;
@@ -219,9 +218,9 @@ imagem *input_calc(imagem *img, imagem **pastilhas,int n_pastilhas)
 	int b_m;
 	printf("Largura %d / Altura %d\n",d_width,d_height );
 
-	for (int i = 0; i < img -> height - 30; i+=30)
+	for (int i = 0; i < img -> height - 29; i+=30)
 	{
-		for (int k = 0; k < img -> width - 30; k+=30)
+		for (int k = 0; k < 3*(img -> width) - 29; k+=30)
 		{
 			r_m = 0;
 			g_m = 0;
@@ -231,7 +230,7 @@ imagem *input_calc(imagem *img, imagem **pastilhas,int n_pastilhas)
 			cont = 0;
 			for (int j = i; j < i+d_height-1; j++)
 			{
-				for (int l = k; l < k+d_width-2; l+=3)
+				for (int l = k; l < k + (3*(d_width)); l+=3)
 				{
 					r_m += img -> pixels[j][l];
 					g_m += img -> pixels[j][l+1];
