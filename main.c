@@ -10,8 +10,7 @@ int main(int argc, char *argv[])
 {
 
 	int n_pastilhas = 0 ;
-	char *path = argv[0];
-	n_pastilhas = calcula_tam(path);
+	n_pastilhas = calcula_tam("./tiles");
 	
 	imagem **pastilhas;	
 	pastilhas = malloc(n_pastilhas*sizeof(**pastilhas));
@@ -19,7 +18,8 @@ int main(int argc, char *argv[])
 
 	printf("%d pastilhas carregadas.\n",n_pastilhas );
 
-	char file[100] = "macaco.ppm";
+	char *file = argv[1];
+
 	imagem *img_crt;
 	img_crt = malloc(sizeof(*img_crt));
 	

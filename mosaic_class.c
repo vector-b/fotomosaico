@@ -10,7 +10,7 @@ int calcula_tam(char *argv)
 	int contador = 0;
 	DIR *d;
     struct dirent *dir;
-    d = opendir("./tiles20");
+    d = opendir("./tiles");
     if (d)
     {
         while ((dir = readdir(d)) != NULL)
@@ -81,7 +81,7 @@ imagem **ler_pastilha(imagem **img)
 	int index = 0;
 	DIR *d;
     struct dirent *dir;
-    d = opendir("./tiles20");
+    d = opendir("./tiles");
     if (d)
     {
         while ((dir = readdir(d)) != NULL)
@@ -92,7 +92,7 @@ imagem **ler_pastilha(imagem **img)
         		imagem *im;
         		im = malloc(100*sizeof(imagem*));
         		
-        		char path[100] = "tiles20/";
+        		char path[100] = "tiles/";
         		strcat(path, dir-> d_name);
         		//printf("%s\n",path );
         		//Inicia o file
@@ -144,7 +144,11 @@ imagem **ler_pastilha(imagem **img)
 imagem *ler_img(imagem *img, char file[100])
 {
 	FILE *fp;
-	fp = fopen(file,"r");
+	if (!(fp = fopen(file,"r")))
+	{
+		printf("deu merda\n");
+		exit(1);
+	}
 
 	//Captura os tipos, tamanhos e color scale
 	char type[2];
@@ -218,9 +222,9 @@ imagem *input_calc(imagem *img, imagem **pastilhas,int n_pastilhas)
 	int b_m;
 	printf("Largura %d / Altura %d\n",d_width,d_height );
 
-	for (int i = 0; i < img -> height - 29; i+=30)
+	for (int i = 0; i < img -> height - d_height-1; i+=d_height)
 	{
-		for (int k = 0; k < 3*(img -> width) - 29; k+=30)
+		for (int k = 0; k < 3*(img -> width) - d_width-1; k+=d_width)
 		{
 			r_m = 0;
 			g_m = 0;
