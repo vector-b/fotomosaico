@@ -10,7 +10,7 @@ int calcula_tam(char *argv)
 	int contador = 0;
 	DIR *d;
     struct dirent *dir;
-    d = opendir("./tiles");
+    d = opendir("./tiles20");
     if (d)
     {
         while ((dir = readdir(d)) != NULL)
@@ -81,7 +81,7 @@ imagem **ler_pastilha(imagem **img)
 	int index = 0;
 	DIR *d;
     struct dirent *dir;
-    d = opendir("./tiles");
+    d = opendir("./tiles20");
     if (d)
     {
         while ((dir = readdir(d)) != NULL)
@@ -92,7 +92,7 @@ imagem **ler_pastilha(imagem **img)
         		imagem *im;
         		im = malloc(100*sizeof(imagem*));
         		
-        		char path[100] = "tiles/";
+        		char path[100] = "tiles20/";
         		strcat(path, dir-> d_name);
         		//printf("%s\n",path );
         		//Inicia o file
@@ -222,9 +222,9 @@ imagem *input_calc(imagem *img, imagem **pastilhas,int n_pastilhas)
 	int b_m;
 	printf("Largura %d / Altura %d\n",d_width,d_height );
 
-	for (int i = 0; i < img -> height - d_height-1; i+=d_height)
+	for (int i = 0; i < img -> height - d_height; i+=d_height)
 	{
-		for (int k = 0; k < 3*(img -> width) - d_width-1; k+=d_width)
+		for (int k = 0; k < 3*(img -> width) - d_width; k+=d_width)
 		{
 			r_m = 0;
 			g_m = 0;
@@ -232,8 +232,7 @@ imagem *input_calc(imagem *img, imagem **pastilhas,int n_pastilhas)
 			//Seção quadrados internos
 			int cont;
 			cont = 0;
-			for (int j = i; j < i+d_height-1; j++)
-			{
+			for (int j = i; j < i + d_height - 1; j++)
 				for (int l = k; l < k + (3*(d_width))-3; l+=3)
 				{
 					r_m += img -> pixels[j][l];
@@ -242,7 +241,7 @@ imagem *input_calc(imagem *img, imagem **pastilhas,int n_pastilhas)
 					
 					cont++;
 				}
-			}
+
 			r_m = r_m /cont;
 			g_m = g_m /cont;
 			b_m = b_m /cont;
@@ -255,12 +254,16 @@ imagem *input_calc(imagem *img, imagem **pastilhas,int n_pastilhas)
 			imagem *pastilha_slt;
 			pastilha_slt = busca_pastilha(pastilhas,n_pastilhas,medias);
 			//substitui pastilha no local
+
+
+			//escreve_img(pastilha_slt);
+			//exit(1);
 			for (int a = 0; a < d_height; a++)
 				for (int b = 0; b < d_width; b+=3)
 				{
 					img -> pixels[i+a][k+b] = pastilha_slt -> pixels[a][b];
 					img -> pixels[i+a][k+b+1] = pastilha_slt -> pixels[a][b+1];
-					img -> pixels[i+a][k+b+1] = pastilha_slt -> pixels[a][b+2];
+					img -> pixels[i+a][k+b+2] = pastilha_slt -> pixels[a][b+2];
 				}
 		}
 	}

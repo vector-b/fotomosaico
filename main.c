@@ -10,7 +10,7 @@ int main(int argc, char *argv[])
 {
 
 	int n_pastilhas = 0 ;
-	n_pastilhas = calcula_tam("./tiles");
+	n_pastilhas = calcula_tam("./tiles20");
 	
 	imagem **pastilhas;	
 	pastilhas = malloc(n_pastilhas*sizeof(**pastilhas));
