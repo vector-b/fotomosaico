@@ -10,7 +10,7 @@ int calcula_tam(char *argv)
 	int contador = 0;
 	DIR *d;
     struct dirent *dir;
-    d = opendir("./tiles20");
+    d = opendir(argv);
     if (d)
     {
         while ((dir = readdir(d)) != NULL)
@@ -20,6 +20,11 @@ int calcula_tam(char *argv)
         closedir(d);
     }
     contador -= 2;
+    if (contador < 0 )
+    {
+    	fprintf (stderr, "Não foi possível encontrar pastilhas! Tente Novamente... \n");
+            exit(1);
+    }
     return contador;
 }
 
@@ -74,14 +79,14 @@ imagem* P6_type(FILE *f, imagem *img)
 
 }
 
-imagem **ler_pastilha(imagem **img)
+imagem **ler_pastilha(imagem **img, char *path_pas)
 {
 
 	int count = 0;
 	int index = 0;
 	DIR *d;
     struct dirent *dir;
-    d = opendir("./tiles20");
+    d = opendir(path_pas);
     if (d)
     {
         while ((dir = readdir(d)) != NULL)
@@ -92,7 +97,9 @@ imagem **ler_pastilha(imagem **img)
         		imagem *im;
         		im = malloc(100*sizeof(imagem*));
         		
-        		char path[100] = "tiles20/";
+        		char path[100] = "";
+        		strcat(path,path_pas);
+        		strcat(path, "/");
         		strcat(path, dir-> d_name);
         		//printf("%s\n",path );
         		//Inicia o file
@@ -141,14 +148,23 @@ imagem **ler_pastilha(imagem **img)
 	return img;
 }
 
-imagem *ler_img(imagem *img, char file[100])
+imagem *ler_img(imagem *img, char file[100], FILE *std, int val_din)
 {
 	FILE *fp;
-	if (!(fp = fopen(file,"r")))
+	if (!val_din)
 	{
-		printf("deu merda\n");
-		exit(1);
+		if (!(fp = fopen(file,"r")))
+		{
+		
+			fprintf (stderr, "Não foi possível encontrar ou abrir esse arquivo! Tente Novamente... \n");
+            exit(1);
+		}
 	}
+	else
+	{
+		fp = std;
+	}
+	
 
 	//Captura os tipos, tamanhos e color scale
 	char type[2];
@@ -220,7 +236,7 @@ imagem *input_calc(imagem *img, imagem **pastilhas,int n_pastilhas)
 	int r_m;
 	int g_m;
 	int b_m;
-	printf("Largura %d / Altura %d\n",d_width,d_height );
+	//printf("Largura %d / Altura %d\n",d_width,d_height );
 
 	for (int i = 0; i < img -> height - d_height; i+=d_height)
 	{
@@ -268,32 +284,42 @@ imagem *input_calc(imagem *img, imagem **pastilhas,int n_pastilhas)
 		}
 	}
 
-	/*
-	for (int i = 0; i < img -> width - d_width; i+= d_width)
-		for (int k = 0; k <  3 * (img -> height - d_height); k+=d_height)
-			for (int j = i; j < (i + d_width) - 1 ; j++)
-				for (int l = k; l < (k + d_height) - 1; l++)
-				{
-					printf("%d \n",img -> pixels[j][l]);
-				}*/
 	return img;
 }
 
-void escreve_img(imagem *img)
+void escreve_img(imagem *img, char *file_out, FILE *sto, int val_out)
 {
-	FILE * new;
-	new = fopen("result.ppm", "wb");
+	FILE *new;
+	if (!val_out)
+	{
+		if(!(new = fopen(file_out, "wb")))
+		{
+			fprintf (stderr, "Não foi possível abrir o arquivo! \n");
+			exit(1);
+		}			
+	}
+	else{
+		rewind(sto);
+		new = sto;
+	}
+	
+	
 	fprintf(new, "%s\n", img -> type);
 	fprintf(new, "%d %d\n", img -> width, img -> height );
 	fprintf(new, "%d",img -> scale);
 	
 	for (int i = 0; i < img -> height ; i++)
 		fwrite(img -> pixels[i], 1, 3*img -> width, new);
-	//fwrite(img->pixels, sizeof(img->pixels), 3*img->height*img->width, new);
-	//or (int j = 0; j < img -> height; j++) 
-	//	fwrite(img->pixels[3*img->width], 1, 3*img->width, new);
 
 	fclose(new);
 
 
+}
+void desalocador(imagem **pastilhas, imagem *result, imagem *src, int n_pastilhas)
+{
+	for (int i = 0; i < n_pastilhas; i++)
+		free(pastilhas[i]);
+	free(pastilhas);
+	free(result);
+	free(src);
 }
