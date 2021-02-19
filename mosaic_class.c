@@ -239,7 +239,7 @@ imagem *input_calc(imagem *img, imagem **pastilhas,int n_pastilhas)
 	//printf("Largura %d / Altura %d\n",d_width,d_height );
 	for (int i = 0; i < img -> height - d_height; i+=d_height)
 	{
-		for (int k = 0; k < 3*(img -> width) - d_width; k+=d_width)
+		for (int k = 0; k < 3*(img -> width) - d_width; k+=3*d_width)
 		{
 			r_m = 0;
 			g_m = 0;
@@ -253,26 +253,26 @@ imagem *input_calc(imagem *img, imagem **pastilhas,int n_pastilhas)
 			for (int j = i; j < i + d_height - 1; j++)
 				for (int l = k; l < k + (3*(d_width))-3; l+=3)
 				{
-					r_m = img -> pixels[j][l];
-					g_m = img -> pixels[j][l+1];
-					b_m = img -> pixels[j][l+2];
+					r_m += img -> pixels[j][l] * img -> pixels[j][l];
+					g_m += img -> pixels[j][l+1] * img -> pixels[j][l+1];
+					b_m += img -> pixels[j][l+2] * img -> pixels[j][l+2];
 
 
-					r_v[cont] = r_m;
-					g_v[cont] = g_m;
-					b_v[cont] = b_m;
+					//r_v[cont] = r_m;
+					//g_v[cont] = g_m;
+					//b_v[cont] = b_m;
 					cont++;
 				}
 
-			r_m = r_v[d_height*d_height/2 +1];
-			g_m = g_v[d_height*d_height/2 +1];
-			b_m = b_v[d_height*d_height/2 +1];
+			//r_m = r_v[d_height*d_height/2 +1];
+			//g_m = g_v[d_height*d_height/2 +1];
+			//b_m = b_v[d_height*d_height/2 +1];
 
-			/*Para usar somente a média
+			//Para usar somente a média
 			
-			r_m = r_m/cont;
-			g_m = g_m/cont;
-			b_m = b_m/cont;*/
+			r_m = sqrt(r_m/cont);
+			g_m = sqrt(g_m/cont);
+			b_m = sqrt(b_m/cont);
 
 			rgb *medias;
 			medias = malloc(sizeof(*medias));
@@ -287,7 +287,7 @@ imagem *input_calc(imagem *img, imagem **pastilhas,int n_pastilhas)
 			//escreve_img(pastilha_slt);
 			//exit(1);
 			for (int a = 0; a < d_height; a++)
-				for (int b = 0; b < d_width; b+=3)
+				for (int b = 0; b < 3*d_width; b+=3)
 				{
 					img -> pixels[i+a][k+b] = pastilha_slt -> pixels[a][b];
 					img -> pixels[i+a][k+b+1] = pastilha_slt -> pixels[a][b+1];
