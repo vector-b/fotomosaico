@@ -237,7 +237,6 @@ imagem *input_calc(imagem *img, imagem **pastilhas,int n_pastilhas)
 	int g_m;
 	int b_m;
 	//printf("Largura %d / Altura %d\n",d_width,d_height );
-
 	for (int i = 0; i < img -> height - d_height; i+=d_height)
 	{
 		for (int k = 0; k < 3*(img -> width) - d_width; k+=d_width)
@@ -248,19 +247,32 @@ imagem *input_calc(imagem *img, imagem **pastilhas,int n_pastilhas)
 			//Seção quadrados internos
 			int cont;
 			cont = 0;
+			int r_v[d_height * d_width];
+			int g_v[d_height * d_width];
+			int b_v[d_height * d_width];
 			for (int j = i; j < i + d_height - 1; j++)
 				for (int l = k; l < k + (3*(d_width))-3; l+=3)
 				{
-					r_m += img -> pixels[j][l];
-					g_m += img -> pixels[j][l+1];
-					b_m += img -> pixels[j][l+2];
-					
+					r_m = img -> pixels[j][l];
+					g_m = img -> pixels[j][l+1];
+					b_m = img -> pixels[j][l+2];
+
+
+					r_v[cont] = r_m;
+					g_v[cont] = g_m;
+					b_v[cont] = b_m;
 					cont++;
 				}
 
-			r_m = r_m /cont;
-			g_m = g_m /cont;
-			b_m = b_m /cont;
+			r_m = r_v[d_height*d_height/2 +1];
+			g_m = g_v[d_height*d_height/2 +1];
+			b_m = b_v[d_height*d_height/2 +1];
+
+			/*Para usar somente a média
+			
+			r_m = r_m/cont;
+			g_m = g_m/cont;
+			b_m = b_m/cont;*/
 
 			rgb *medias;
 			medias = malloc(sizeof(*medias));
