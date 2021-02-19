@@ -77,13 +77,13 @@ int main(int argc, char *argv[])
 	num = ftell (stdin);
 	if ((std == 1) && (num > 0))
 	{
-		printf("Entrada recebida por STDIN\n");
+		printf("Input by STDIN\n");
 		val_din = 1;
 		rewind(stdin);
 	}
 	else if (std == 0)
 	{
-		printf("Entrada recebida por Parâmetro\n");
+		printf("Input by -i\n");
 	}
 	
 	printf("Reading input image\n");
