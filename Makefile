@@ -10,4 +10,4 @@ hello:${OBJS}
 	${CC} -o  ${TARG} ${OBJS} ${INCLUDE} ${LIBS} ${CFLAG}
 
 clean:
-	-rm -f *.o space_invaders
+	-rm -f *.o mosaico

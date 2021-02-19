@@ -5,6 +5,7 @@
 #include <math.h>
 #include "mosaic_class.h"
 
+//Calcula a quantidade de pastilhas de um dado diretório
 int calcula_tam(char *argv)
 {
 	int contador = 0;
@@ -27,17 +28,9 @@ int calcula_tam(char *argv)
     }
     return contador;
 }
-
-FILE* P3_type(FILE *f, imagem *img)
+//Função usada para salvar os dados da imagem e armazená-los
+imagem* P_type(FILE *f, imagem *img)
 {
-	return f;
-}
-
-imagem* P6_type(FILE *f, imagem *img)
-{
-
-	//img -> pixels = malloc(img -> width * img -> height * sizeof(img -> pixels));
-	//fread(img->pixels, 3 * img->width, img->height, f);
 	img -> pixels = malloc(img -> height * sizeof(img -> pixels));
 	for (int i = 0; i < img -> height; i++)
 		img -> pixels[i] = malloc(img -> width * 3 * sizeof(img -> pixels));	
@@ -76,15 +69,15 @@ imagem* P6_type(FILE *f, imagem *img)
 	fclose(f);
 
 	return img;
-
 }
-
+//Função responsável por percorrer o diretório e procurar pastilhas
 imagem **ler_pastilha(imagem **img, char *path_pas)
 {
 
 	int count = 0;
 	int index = 0;
 	DIR *d;
+	FILE *fp;
     struct dirent *dir;
     d = opendir(path_pas);
     if (d)
@@ -93,7 +86,6 @@ imagem **ler_pastilha(imagem **img, char *path_pas)
         {
         	if (count >= 2)
         	{
-        		//printf("%s\n", dir->d_name);
         		imagem *im;
         		im = malloc(100*sizeof(imagem*));
         		
@@ -101,9 +93,7 @@ imagem **ler_pastilha(imagem **img, char *path_pas)
         		strcat(path,path_pas);
         		strcat(path, "/");
         		strcat(path, dir-> d_name);
-        		//printf("%s\n",path );
         		//Inicia o file
-        		FILE *fp;
         		if (!(fp = fopen(path,"r")))
         		{
         			printf("erro\n");
@@ -127,15 +117,10 @@ imagem **ler_pastilha(imagem **img, char *path_pas)
         		im -> height = height;
         		im -> scale = color_scale;
         		im -> max = MAX_PIXELS;
-        		//printf(" Tipo: %s \n Altura: %d \n Largura: %d \n Escala: %d \n Pixels: %d \n ",im -> type,im -> height, im -> width,im -> scale,im -> max);
+        		im = P_type(fp, im);
 
-        		im = P6_type(fp, im);
-
-		//   ARRUMAR ISSO PORA     		fclose(fp);
-        		
-        		//img[index] = malloc(100*sizeof(im));
+				
         		img[index] = im;
-        		//printf("%d\n",index );
         		index++;
         	}
             
@@ -144,10 +129,10 @@ imagem **ler_pastilha(imagem **img, char *path_pas)
         }
         closedir(d);
     }
-
+    fclose(fp);
 	return img;
 }
-
+//Função responsável por ler a imagem do file  
 imagem *ler_img(imagem *img, char file[100], FILE *std, int val_din)
 {
 	FILE *fp;
@@ -168,8 +153,31 @@ imagem *ler_img(imagem *img, char file[100], FILE *std, int val_din)
 
 	//Captura os tipos, tamanhos e color scale
 	char type[2];
+	char buffer[100];
 
-	fscanf(fp, "%s", type); 
+
+	fscanf(fp, "%s\n", type);
+
+	if((strcmp(type,"P6") != 0) && (strcmp(type,"P3") != 0))
+	{
+		fprintf (stderr, "Tipo de arquivo inválido! \n");
+		exit(1);
+	}
+	int len = ftell(fp);
+	int pass = 1;
+	while (pass)
+	{
+		fgets(buffer, 100, fp);
+		if (buffer[0] != '#')
+		{
+			pass = 0;
+			fseek( fp, len, SEEK_SET );
+		}
+		else
+			len = ftell(fp);
+	}
+
+	type[2] = '\0';
 	
 	int height;
 	int width;
@@ -183,16 +191,19 @@ imagem *ler_img(imagem *img, char file[100], FILE *std, int val_din)
 	MAX_PIXELS = height * width;
 
 	strcpy(img -> type , type);
+
+		
+	//Armazena no tipo arquivo imagem
 	img -> width = width;
 	img -> height = height;
 	img -> scale = color_scale;
 	img -> max = MAX_PIXELS;
 
-	img = P6_type(fp, img);
+	img = P_type(fp, img);
 
 	return img;
 }
-
+//Função responsável por buscar as pastilhas em seus respectivos diretórios e retornar para um bloco NxN da imagem
 imagem *busca_pastilha(imagem **pastilhas, int n_pastilhas, rgb *medias)
 {
 	int n_pas_reco = 0;
@@ -227,8 +238,8 @@ imagem *busca_pastilha(imagem **pastilhas, int n_pastilhas, rgb *medias)
 		}
 	}
 	return pastilhas[n_pas_reco];
-
 }
+//Função principal do efeito mosaico, procura em blocos NxN por pastilhas com cor correspondente
 imagem *input_calc(imagem *img, imagem **pastilhas,int n_pastilhas)
 {
 	int d_height = pastilhas[0] -> height;
@@ -236,8 +247,7 @@ imagem *input_calc(imagem *img, imagem **pastilhas,int n_pastilhas)
 	int r_m;
 	int g_m;
 	int b_m;
-	//printf("Largura %d / Altura %d\n",d_width,d_height );
-	for (int i = 0; i < img -> height - d_height; i+=d_height)
+	for (int i = 0; i < img -> height - d_height + 1; i+=d_height)
 	{
 		for (int k = 0; k < 3*(img -> width) - d_width; k+=3*d_width)
 		{
@@ -247,10 +257,12 @@ imagem *input_calc(imagem *img, imagem **pastilhas,int n_pastilhas)
 			//Seção quadrados internos
 			int cont;
 			cont = 0;
-			int r_v[d_height * d_width];
-			int g_v[d_height * d_width];
-			int b_v[d_height * d_width];
-			for (int j = i; j < i + d_height - 1; j++)
+			//Vetor usado caso queira usar mediana invés de média dos quadrados
+
+			//int r_v[d_height * d_width];
+			//int g_v[d_height * d_width];
+			//int b_v[d_height * d_width];
+			for (int j = i; j < i + d_height; j++)
 				for (int l = k; l < k + (3*(d_width))-3; l+=3)
 				{
 					r_m += img -> pixels[j][l] * img -> pixels[j][l];
@@ -281,13 +293,9 @@ imagem *input_calc(imagem *img, imagem **pastilhas,int n_pastilhas)
 			medias -> b = b_m;
 			imagem *pastilha_slt;
 			pastilha_slt = busca_pastilha(pastilhas,n_pastilhas,medias);
-			//substitui pastilha no local
-
-
-			//escreve_img(pastilha_slt);
-			//exit(1);
+			//Substitui pastilha no local
 			for (int a = 0; a < d_height; a++)
-				for (int b = 0; b < 3*d_width; b+=3)
+				for (int b = 0; b < 3*d_width-3; b+=3)
 				{
 					img -> pixels[i+a][k+b] = pastilha_slt -> pixels[a][b];
 					img -> pixels[i+a][k+b+1] = pastilha_slt -> pixels[a][b+1];
@@ -298,7 +306,7 @@ imagem *input_calc(imagem *img, imagem **pastilhas,int n_pastilhas)
 
 	return img;
 }
-
+//Função responsável por imprimir a imagem resultante no arquivo de saída
 void escreve_img(imagem *img, char *file_out, FILE *sto, int val_out)
 {
 	FILE *new;
@@ -315,7 +323,7 @@ void escreve_img(imagem *img, char *file_out, FILE *sto, int val_out)
 		new = sto;
 	}
 	
-	
+	//Imprime os tipos e usa fwrite para a matriz
 	fprintf(new, "%s\n", img -> type);
 	fprintf(new, "%d %d\n", img -> width, img -> height );
 	fprintf(new, "%d",img -> scale);
@@ -324,9 +332,8 @@ void escreve_img(imagem *img, char *file_out, FILE *sto, int val_out)
 		fwrite(img -> pixels[i], 1, 3*img -> width, new);
 
 	fclose(new);
-
-
 }
+//Função utilizada para desalocar as estruturas usadas
 void desalocador(imagem **pastilhas, imagem *result, imagem *src, int n_pastilhas)
 {
 	for (int i = 0; i < n_pastilhas; i++)
