@@ -29,12 +29,10 @@ int main(int argc, char *argv[])
         switch(opt)  
         {  
             case 'i':
-            	//printf("filename: %s\n", optarg);
             	file = optarg;
             	std = 0;
             	break;
             case 'o':
-                //printf("filename: %s\n", optarg);
                 file_out = optarg;
                 sto = 0;
             	break;
@@ -43,7 +41,7 @@ int main(int argc, char *argv[])
             	break;
             case 'h':
             {
-            	fprintf (stderr, "Este programa realiza mosaicos! \n");
+            	fprintf (stderr, "Este programa realiza mosaicos!\nUse -i (fonte) para indicar onde o programa deve procurar a imagem de origem\nUse -o (fonte) para indicar onde o progrmaa deve direcionar a imagem de saida\nUse -p (fonte) para indicar onde o programa deve procurar as pastilhas\n ");
             	exit(1);
             	break;
             }
@@ -55,6 +53,7 @@ int main(int argc, char *argv[])
 	n_pastilhas = calcula_tam(path_past);
 
 	printf("Reading tiles from %s\n",path_past );
+
 	//Lê todas as pastilhas na pasta e armazenas em uma vetor de imagens
 	imagem **pastilhas;	
 	pastilhas = malloc(n_pastilhas*sizeof(**pastilhas));
@@ -95,12 +94,14 @@ int main(int argc, char *argv[])
 	//Constroi o mosaico e retorna em result
 	printf("Building mosaic image\n");
 	imagem *result;
+	//Imagem resultante após fazer o mosaico
 	result = input_calc(img_crt,pastilhas,n_pastilhas);
 
 	//Escreve o arquivo em uma saida
 	printf("Writing output file\n");
 	escreve_img(result,file_out, stdout, sto);
-
+	
+	//Desaloca
 	desalocador(pastilhas,result,img_crt,n_pastilhas);
 	
 	return 0;
